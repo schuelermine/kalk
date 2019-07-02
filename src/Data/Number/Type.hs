@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, GADTs, TypeOperators, NoStarIsType, KindSignatures, UndecidableInstances, PatternSynonyms #-}
 
-module Data.Number.Internal where
+module Data.Number.Types where
 
 import Data.Kind
 import Data.Complex
@@ -18,12 +18,16 @@ data Number :: Type where
 
 data Infinite :: Type -> Type where
     -- Type with some kind of infinity,
-    -- for example: ℝ+\{-∞}
+    -- for example: ℝ+\{-∞} or ℝ̂
     Infinite :: Infinite t
     Only :: t -> Infinite t
 
 pattern Infinity = Infinite
+pattern Infinity :: Infinite a
 pattern MinusInfinity = Infinite
+pattern MinusInfinity :: Infinite a
+
+type NegativlyInfinite = Infinite
 
 data Error :: Type where
     OutOfDomain :: Operand n -> Error
@@ -58,7 +62,7 @@ data Formula :: Type -> Natural -> Type where
     Value :: Complex Number -> Formula a n
     Function :: Operand One -> Formula a n -> Formula a n
     Operation :: Operand Two -> Formula a n -> Formula a n -> Formula a n
-    Fold :: Infinite Integer -> Infinite Integer -> Formula b ('Succ ('Succ n)) -> Formula a ('Succ n) -> Formula a n
+    Fold :: Infinite Integer -> NegativlyInfinite Integer -> Formula b Two -> Formula a ('Succ n) -> Formula a n
     -- for example: Fold (FromInteger '7) (FromInteger '10) (Operation Addition (Unknown one) (Unknown two)) (Operation Addition (Unknown one) (Unknown two))
 
 data Operand :: Natural -> Type where
