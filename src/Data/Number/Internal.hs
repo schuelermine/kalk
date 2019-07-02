@@ -1,44 +1,56 @@
+{-# LANGUAGE DataKinds, TypeFamilies, GADTs, TypeOperators, NoStarIsType, KindSignatures, UndecidableInstances, PatternSynonyms #-}
+
 module Data.Number.Internal where
 
-import Data.Scientific
+import Data.Kind
 import Data.Complex
-import Numeric.Natural
 
-data N  = N (Complex Scientific)
-        | V C
-        | NaN
-        | Sum {summand1 :: N, summand2 :: N}
-        | Negative {unnegate :: N}
-        | Product {factor1 :: N, factor2 :: N}
-        | Reciprocal {unreciprocal :: N}
-        | Difference {minuend :: N, subtrahend :: N}
-        | Quotient {dividend :: N, divisor :: N}
-        | Root {index :: N, radicand :: N}
-        | Power {base :: N, exponent :: N}
-        | Logarithm {logbase :: N, logval :: N}
-        | Sine {unsine :: N}
-        | Cosine {uncosine :: N}
-        | Tangent {untangent :: N}
-        | Cotangent {uncotangent :: N}
-        | Secant {unsecant :: N}
-        | Cosecant {uncosecant :: N}
-        | Arcsine {unarcsione :: N}
-        | Arccosine {unarccosine :: N}
-        | Arctangent {unarctangent :: N}
-        | Arccotangent {unarccotangent :: N}
-        | Arcsecant {unarcsecant :: N}
-        | Arccosecant {unarccosecant :: N}
-        | SeriesSum {summin :: Natural, summax :: Natural, sumf :: N}
-        | SeriesProduct {prodmin :: Natural, prodmax :: Natural, prodf :: N}
-        | Unknown
-        | Inequality {eqtype :: Ordering, value1 :: N, value2 :: N}
-        | Derivative {integral :: Natural}
+data Natural :: Type where
+    Zero :: Natural
+    Succ :: Natural -> Natural
 
-data C = Pi | Phi | I | E
+data Number :: Type where
+    Number :: Integer -> Integer -> Natural -> Number
 
-complete :: N -> Bool
-complete (N _) = True
-complete (C _) = True
-complete NaN = False
-complete (Sum p q) = complete p && complete q
-complete Unknown = False
+data Infinite :: Type -> Type where
+    Infinite :: Infinite t
+    Only :: t -> Infinite t
+
+pattern Infinity = Infinite
+pattern MinusInfinity = Infinite
+
+data Error :: Type where
+    DivDomain :: Error
+    ArcsinDomain :: Error
+    ArccosDomain :: Error
+    ArcsecDomain :: Error
+    ArccscDomain :: Error
+    SeriesBoundsOrder :: Error
+    Unsupported :: Error
+    Other :: String -> Error
+
+data Constant :: Type where
+    Pi :: Constant
+    Phi :: Constant
+    E :: Constant
+    I :: Constant
+
+data Formula :: Natural -> Type where
+    Error :: Error -> Formula n
+    Unknown :: Natural -> Formula ('Succ n)
+    Constant :: Constant -> Formula n
+    Value :: Complex Number -> Formula n
+    Addition :: Formula n -> Formula n -> Formula n
+    Negation :: Formula n -> Formula n
+    Multiplication :: Formula n -> Formula n -> Formula n
+    Reciprocation :: Formula n -> Formula n
+    Sum :: Infinite Natural -> Infinite Natural -> Formula ('Succ n) -> Formula n
+    Product :: Infinite Natural -> Infinite Natural -> Formula ('Succ n) -> Formula n
+    Integral :: Infinite Natural -> Infinite Natural -> Formula ('Succ n) -> Formula n
+    Apply :: Natural -> Formula ('Succ n) -> Formula n
+    Sine :: Formula n -> Formula n
+    Cosine :: Formula n -> Formula n
+    Tangent :: Formula n -> Formula n
+    Cotangent :: Formula n -> Formula n
+    Secant :: Formula n -> Formula n
+    Cosecant :: Formula n -> Formula n
