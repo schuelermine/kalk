@@ -18,7 +18,7 @@ data Number :: Type where
 
 data Infinite :: Type -> Type where
     -- Type with some kind of infinity,
-    -- for example: ℝ+ > (-∞)
+    -- for example: ℝ+\{-∞}
     Infinite :: Infinite t
     Only :: t -> Infinite t
 
