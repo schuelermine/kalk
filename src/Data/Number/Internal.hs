@@ -20,13 +20,7 @@ pattern Infinity = Infinite
 pattern MinusInfinity = Infinite
 
 data Error :: Type where
-    DivDomain :: Error
-    ArcsinDomain :: Error
-    ArccosDomain :: Error
-    ArcsecDomain :: Error
-    ArccscDomain :: Error
-    SeriesBoundsOrder :: Error
-    Unsupported :: Error
+    OutOfDomain :: Error
     Other :: String -> Error
 
 data Constant :: Type where
