@@ -9,9 +9,9 @@ data Natural :: Type where
     Zero :: Natural
     Succ :: Natural -> Natural
 
-type One = Succ Zero
-type Two = Succ One
-type Three = Succ Two
+type One = 'Succ 'Zero
+type Two = 'Succ One
+type Three = 'Succ Two
 
 data Number :: Type where
     Number :: Integer -> Integer -> Natural -> Number
@@ -51,14 +51,14 @@ data Domain :: Type where
     R :: Domain
     C :: Domain
 
-data Formula :: Specificity -> Natural -> Type where
+data Formula :: Type -> Natural -> Type where
     Error :: Error -> Formula a n
-    Unknown :: Natural -> Formula a ('Succ n)
+    Unknown :: a -> Formula a ('Succ n)
     Constant :: Constant -> Formula a n
     Value :: Complex Number -> Formula a n
     Function :: Operand One -> Formula a n -> Formula a n
     Operation :: Operand Two -> Formula a n -> Formula a n -> Formula a n
-    Fold :: Infinite Integer -> Infinite Integer -> Formula Unspecific ('Succ ('Succ n)) -> Formula Unspecific ('Succ n) -> Formula a n
+    Fold :: Infinite Integer -> Infinite Integer -> Formula b ('Succ ('Succ n)) -> Formula a ('Succ n) -> Formula a n
     -- for example: Fold (FromInteger '7) (FromInteger '10) (Operation Addition (Unknown one) (Unknown two)) (Operation Addition (Unknown one) (Unknown two))
 
 data Operand :: Natural -> Type where
