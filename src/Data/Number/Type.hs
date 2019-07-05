@@ -85,3 +85,14 @@ data Operand :: Natural -> Type where
     Exponentiation :: Operand Two
     Logarithm :: Operand Two
     Root :: Operand Two
+
+instance Num Number where
+
+instance Num (Formula a n) where
+    a + b = Operation Addition a b
+    a - b = Operation Addition a (Function Negation b)
+    negate a = Function Negation a
+    a * b = Operation Multiplication a b
+    abs = absFormula
+    signum = signumFormula
+    fromInteger = fromIntegerFormula
