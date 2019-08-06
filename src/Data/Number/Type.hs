@@ -4,6 +4,7 @@ module Data.Number.Types where
 
 import Data.Kind
 import Data.Complex
+import Data.Ratio
 
 data Natural :: Type where
     Zero :: Natural
@@ -12,9 +13,6 @@ data Natural :: Type where
 type One = 'Succ 'Zero
 type Two = 'Succ One
 type Three = 'Succ Two
-
-data Number :: Type where
-    Number :: Integer -> Integer -> Natural -> Number
 
 data Infinite :: Type -> Type where
     -- Type with some kind of infinity,
@@ -59,10 +57,9 @@ data Formula :: Type -> Natural -> Type where
     Error :: Error -> Formula a n
     Unknown :: a -> Formula a ('Succ n)
     Constant :: Constant -> Formula a n
-    Value :: Complex Number -> Formula a n
+    Value :: Complex Rational -> Formula a n
     Function :: Operand One -> Formula a n -> Formula a n
     Operation :: Operand Two -> Formula a n -> Formula a n -> Formula a n
-    Fold :: Infinite Integer -> NegativlyInfinite Integer -> Formula b Two -> Formula a ('Succ n) -> Formula a n
     -- for example: Fold (FromInteger '7) (FromInteger '10) (Operation Addition (Unknown one) (Unknown two)) (Operation Addition (Unknown one) (Unknown two))
 
 data Operand :: Natural -> Type where
@@ -85,8 +82,6 @@ data Operand :: Natural -> Type where
     Exponentiation :: Operand Two
     Logarithm :: Operand Two
     Root :: Operand Two
-
-instance Num Number where
 
 instance Num (Formula a n) where
     a + b = Operation Addition a b
